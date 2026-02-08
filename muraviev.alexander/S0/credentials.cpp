@@ -3,5 +3,5 @@
 
 std::ostream & muraviev::out_credentials(std::ostream & out)
 {
-  return out << "muraviev.alexanderrrrrrr" << "\n";
+  return out << "muraviev.alexander";
 }

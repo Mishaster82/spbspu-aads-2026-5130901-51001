@@ -3,5 +3,5 @@
 
 int main()
 {
-  muraviev::out_credentials(std::cout);
+  muraviev::out_credentials(std::cout) << "\n";
 }
