@@ -5,3 +5,4 @@ int main()
 {
   vishnaykov::out_credentials(std::cout) << '/n';
 }
+

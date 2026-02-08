@@ -6,4 +6,6 @@ namespace vishnaykov
 {
   std::ostream & vishnaykov::out_credentials(std::ostream & out);
 }
+
 #endif
+
