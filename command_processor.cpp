@@ -1,9 +1,6 @@
 #include "command_processor.h"
 
-#include <fstream>
 #include <sstream>
-#include <stdexcept>
-#include <string>
 
 namespace novikov {
 
@@ -49,7 +46,7 @@ CommandProcessor::CommandProcessor(std::istream& in, std::ostream& out,
 {
 }
 
-IntervalSet& CommandProcessor::getTree(const std::string& name)
+IntIntervalSet& CommandProcessor::getTree(const std::string& name)
 {
   const auto found = trees_.find(name);
 
@@ -59,7 +56,7 @@ IntervalSet& CommandProcessor::getTree(const std::string& name)
   return found->second;
 }
 
-const IntervalSet& CommandProcessor::getTree(const std::string& name) const
+const IntIntervalSet& CommandProcessor::getTree(const std::string& name) const
 {
   const auto found = trees_.find(name);
 
@@ -69,9 +66,9 @@ const IntervalSet& CommandProcessor::getTree(const std::string& name) const
   return found->second;
 }
 
-void CommandProcessor::printIntervals(const IntervalSet& tree) const
+void CommandProcessor::printIntervals(const IntIntervalSet& tree) const
 {
-  const std::vector<IntervalSet::Interval> result = tree.getIntervals();
+  const std::vector<IntIntervalSet::Interval> result = tree.getIntervals();
 
   if (result.empty()) {
     out_ << "{}\n";
@@ -102,7 +99,7 @@ void CommandProcessor::handleCreate(std::istream& args)
     throw std::runtime_error("tree already exists: '" + name + "'");
   }
 
-  trees_.emplace(name, IntervalSet(rangeSize));
+  trees_.emplace(name, IntIntervalSet(rangeSize));
   out_ << "OK\n";
 }
 
@@ -112,7 +109,7 @@ void CommandProcessor::handleAdd(std::istream& args)
   const int left = readInt(args, "add");
   const int right = readInt(args, "add");
 
-  IntervalSet& tree = getTree(name);
+  IntIntervalSet& tree = getTree(name);
 
   tree.add(left, right);
 }
@@ -123,7 +120,7 @@ void CommandProcessor::handleRemove(std::istream& args)
   const int left = readInt(args, "remove");
   const int right = readInt(args, "remove");
 
-  IntervalSet& tree = getTree(name);
+  IntIntervalSet& tree = getTree(name);
 
   tree.remove(left, right);
 }
@@ -133,7 +130,7 @@ void CommandProcessor::handleHas(std::istream& args)
   const std::string name = readToken(args, "has");
   const int point = readInt(args, "has");
 
-  const IntervalSet& tree = getTree(name);
+  const IntIntervalSet& tree = getTree(name);
 
   out_ << (tree.has(point) ? "YES" : "NO") << '\n';
 }
@@ -141,7 +138,7 @@ void CommandProcessor::handleHas(std::istream& args)
 void CommandProcessor::handleLength(std::istream& args)
 {
   const std::string name = readToken(args, "length");
-  const IntervalSet& tree = getTree(name);
+  const IntIntervalSet& tree = getTree(name);
 
   out_ << tree.getLength() << '\n';
 }
@@ -149,7 +146,7 @@ void CommandProcessor::handleLength(std::istream& args)
 void CommandProcessor::handleShow(std::istream& args)
 {
   const std::string name = readToken(args, "show");
-  const IntervalSet& tree = getTree(name);
+  const IntIntervalSet& tree = getTree(name);
 
   printIntervals(tree);
 }
@@ -160,11 +157,11 @@ void CommandProcessor::handleUnion(std::istream& args)
   const std::string firstName = readToken(args, "union");
   const std::string secondName = readToken(args, "union");
 
-  const IntervalSet& first = getTree(firstName);
-  const IntervalSet& second = getTree(secondName);
+  const IntIntervalSet& first = getTree(firstName);
+  const IntIntervalSet& second = getTree(secondName);
 
   trees_.erase(newName);
-  trees_.emplace(newName, IntervalSet::unite(first, second));
+  trees_.emplace(newName, IntIntervalSet::unite(first, second));
 }
 
 void CommandProcessor::handleIntersect(std::istream& args)
@@ -173,11 +170,11 @@ void CommandProcessor::handleIntersect(std::istream& args)
   const std::string firstName = readToken(args, "intersect");
   const std::string secondName = readToken(args, "intersect");
 
-  const IntervalSet& first = getTree(firstName);
-  const IntervalSet& second = getTree(secondName);
+  const IntIntervalSet& first = getTree(firstName);
+  const IntIntervalSet& second = getTree(secondName);
 
   trees_.erase(newName);
-  trees_.emplace(newName, IntervalSet::intersect(first, second));
+  trees_.emplace(newName, IntIntervalSet::intersect(first, second));
 }
 
 void CommandProcessor::handleSave(std::istream& args)
@@ -185,7 +182,7 @@ void CommandProcessor::handleSave(std::istream& args)
   const std::string name = readToken(args, "save");
   const std::string filename = readToken(args, "save");
 
-  const IntervalSet& tree = getTree(name);
+  const IntIntervalSet& tree = getTree(name);
 
   std::ifstream existing(filename);
 
@@ -215,7 +212,7 @@ void CommandProcessor::handleLoad(std::istream& args)
   const std::string name = readToken(args, "load");
   const std::string filename = readToken(args, "load");
 
-  IntervalSet placeholder(1);
+  IntIntervalSet placeholder(1);
 
   if (!placeholder.load(filename)) {
     throw std::runtime_error("failed to read file '" + filename + "'");

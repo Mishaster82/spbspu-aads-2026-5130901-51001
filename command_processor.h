@@ -21,7 +21,7 @@ private:
   std::istream& in_;
   std::ostream& out_;
   std::ostream& err_;
-  std::map<std::string, IntervalSet> trees_;
+  std::map<std::string, IntIntervalSet> trees_;
 
   bool processLine(const std::string& line);
 
@@ -36,9 +36,9 @@ private:
   void handleSave(std::istream& args);
   void handleLoad(std::istream& args);
 
-  IntervalSet& getTree(const std::string& name);
-  const IntervalSet& getTree(const std::string& name) const;
-  void printIntervals(const IntervalSet& tree) const;
+  IntIntervalSet& getTree(const std::string& name);
+  const IntIntervalSet& getTree(const std::string& name) const;
+  void printIntervals(const IntIntervalSet& tree) const;
 };
 
 }

@@ -1,10 +1,7 @@
 #include <cstdint>
 #include <cstdio>
-#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
 
 #include "command_processor.h"
 #include "interval_set.h"
@@ -86,7 +83,7 @@ ProcessorResult runProcessor(const std::string& input)
 
 void testEmptyTreeHas()
 {
-  const novikov::IntervalSet tree(100);
+  const novikov::IntIntervalSet tree(100);
   expectTrue(!tree.has(0), "empty: !has(0)");
   expectTrue(!tree.has(50), "empty: !has(50)");
   expectTrue(!tree.has(99), "empty: !has(99)");
@@ -94,7 +91,7 @@ void testEmptyTreeHas()
 
 void testEmptyTreeLengthAndIntervals()
 {
-  const novikov::IntervalSet tree(100);
+  const novikov::IntIntervalSet tree(100);
   expect64(tree.getLength(), 0, "empty: length 0");
   expectInt(static_cast<int>(tree.getIntervals().size()), 0,
             "empty: no intervals");
@@ -103,7 +100,7 @@ void testEmptyTreeLengthAndIntervals()
 
 void testAddSingleInterval()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 20);
 
   expectTrue(tree.has(10), "single: has(10)");
@@ -113,7 +110,7 @@ void testAddSingleInterval()
   expectTrue(!tree.has(21), "single: !has(21)");
   expect64(tree.getLength(), 10, "single: length 10");
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       tree.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 1, "single: 1 interval");
   expectInt(intervals[0].first, 10, "single: first");
@@ -122,11 +119,11 @@ void testAddSingleInterval()
 
 void testAddMergesOverlapping()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 20);
   tree.add(15, 28);
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       tree.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 1,
             "merge overlap: 1 interval");
@@ -136,11 +133,11 @@ void testAddMergesOverlapping()
 
 void testAddMergesAdjacent()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 20);
   tree.add(21, 30);
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       tree.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 1,
             "merge adjacent: 1 interval");
@@ -150,11 +147,11 @@ void testAddMergesAdjacent()
 
 void testAddKeepsSeparate()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 14);
   tree.add(19, 30);
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       tree.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 2,
             "separate: 2 intervals");
@@ -166,7 +163,7 @@ void testAddKeepsSeparate()
 
 void testRemoveSplitsInterval()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 30);
   tree.remove(15, 18);
 
@@ -176,7 +173,7 @@ void testRemoveSplitsInterval()
   expectTrue(tree.has(19), "remove: has(19)");
   expect64(tree.getLength(), 15, "remove: length 15");
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       tree.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 2, "remove: 2 intervals");
   expectInt(intervals[0].first, 10, "remove: left.first");
@@ -187,7 +184,7 @@ void testRemoveSplitsInterval()
 
 void testRemoveAll()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 20);
   tree.remove(10, 20);
 
@@ -197,7 +194,7 @@ void testRemoveAll()
 
 void testRemoveFromEmpty()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.remove(10, 20);
 
   expect64(tree.getLength(), 0, "remove from empty: length 0");
@@ -206,7 +203,7 @@ void testRemoveFromEmpty()
 
 void testHasOutOfRange()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(0, 99);
 
   expectTrue(tree.has(0), "range: has(0)");
@@ -217,7 +214,7 @@ void testHasOutOfRange()
 
 void testAddOutOfRangeThrows()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
 
   bool thrown = false;
   try {
@@ -254,7 +251,7 @@ void testAddOutOfRangeThrows()
 
 void testLengthExampleFromTask()
 {
-  novikov::IntervalSet tree(100);
+  novikov::IntIntervalSet tree(100);
   tree.add(10, 20);
   tree.add(25, 30);
   tree.add(15, 28);
@@ -265,15 +262,15 @@ void testLengthExampleFromTask()
 
 void testUnite()
 {
-  novikov::IntervalSet left(100);
+  novikov::IntIntervalSet left(100);
   left.add(10, 14);
   left.add(19, 30);
 
-  novikov::IntervalSet right(100);
+  novikov::IntIntervalSet right(100);
   right.add(40, 50);
 
-  const novikov::IntervalSet result =
-      novikov::IntervalSet::unite(left, right);
+  const novikov::IntIntervalSet result =
+      novikov::IntIntervalSet::unite(left, right);
 
   expectInt(result.getRangeSize(), 100, "unite: range");
   expectInt(static_cast<int>(result.getIntervals().size()), 3,
@@ -283,14 +280,14 @@ void testUnite()
 
 void testUniteDifferentRangeSizes()
 {
-  novikov::IntervalSet small(50);
+  novikov::IntIntervalSet small(50);
   small.add(0, 10);
 
-  novikov::IntervalSet big(200);
+  novikov::IntIntervalSet big(200);
   big.add(100, 150);
 
-  const novikov::IntervalSet result =
-      novikov::IntervalSet::unite(small, big);
+  const novikov::IntIntervalSet result =
+      novikov::IntIntervalSet::unite(small, big);
 
   expectInt(result.getRangeSize(), 200, "unite diff: max range");
   expectTrue(result.has(0), "unite diff: has(0)");
@@ -299,17 +296,17 @@ void testUniteDifferentRangeSizes()
 
 void testIntersect()
 {
-  novikov::IntervalSet left(100);
+  novikov::IntIntervalSet left(100);
   left.add(10, 14);
   left.add(19, 30);
 
-  novikov::IntervalSet right(100);
+  novikov::IntIntervalSet right(100);
   right.add(12, 22);
 
-  const novikov::IntervalSet result =
-      novikov::IntervalSet::intersect(left, right);
+  const novikov::IntIntervalSet result =
+      novikov::IntIntervalSet::intersect(left, right);
 
-  const std::vector<novikov::IntervalSet::Interval> intervals =
+  const std::vector<novikov::IntIntervalSet::Interval> intervals =
       result.getIntervals();
   expectInt(static_cast<int>(intervals.size()), 2,
             "intersect: 2 intervals");
@@ -321,14 +318,14 @@ void testIntersect()
 
 void testIntersectEmpty()
 {
-  novikov::IntervalSet left(100);
+  novikov::IntIntervalSet left(100);
   left.add(10, 20);
 
-  novikov::IntervalSet right(100);
+  novikov::IntIntervalSet right(100);
   right.add(50, 60);
 
-  const novikov::IntervalSet result =
-      novikov::IntervalSet::intersect(left, right);
+  const novikov::IntIntervalSet result =
+      novikov::IntIntervalSet::intersect(left, right);
 
   expect64(result.getLength(), 0, "intersect empty: length 0");
   expectTrue(result.getIntervals().empty(), "intersect empty: empty");
@@ -336,11 +333,11 @@ void testIntersectEmpty()
 
 void testCopyAndMove()
 {
-  novikov::IntervalSet original(100);
+  novikov::IntIntervalSet original(100);
   original.add(10, 20);
   original.add(30, 40);
 
-  novikov::IntervalSet copy(original);
+  novikov::IntIntervalSet copy(original);
   expectTrue(copy.has(10), "copy: has(10)");
   expectTrue(copy.has(30), "copy: has(30)");
   expect64(copy.getLength(), 20, "copy: length 20");
@@ -349,7 +346,7 @@ void testCopyAndMove()
   expectTrue(!original.has(10), "copy indep: original changed");
   expectTrue(copy.has(10), "copy indep: copy unchanged");
 
-  novikov::IntervalSet moved(std::move(copy));
+  novikov::IntIntervalSet moved(std::move(copy));
   expectTrue(moved.has(10), "move: has(10)");
   expectTrue(moved.has(30), "move: has(30)");
 }
@@ -360,14 +357,14 @@ void testSaveLoadRoundTrip()
   std::remove(filename.c_str());
 
   {
-    novikov::IntervalSet tree(100);
+    novikov::IntIntervalSet tree(100);
     tree.add(10, 14);
     tree.add(19, 30);
     expectTrue(tree.save(filename), "save: true");
   }
 
   {
-    novikov::IntervalSet tree(1);
+    novikov::IntIntervalSet tree(1);
     expectTrue(tree.load(filename), "load: true");
     expectInt(tree.getRangeSize(), 100, "load: range 100");
     expectTrue(tree.has(10), "load: has(10)");
@@ -390,7 +387,7 @@ void testLoadDanglingPair()
     out << "10\n";
   }
 
-  novikov::IntervalSet tree(1);
+  novikov::IntIntervalSet tree(1);
   expectTrue(!tree.load(filename), "load dangling: false");
 
   std::remove(filename.c_str());
@@ -406,7 +403,7 @@ void testLoadMalformedHeader()
     out << "-5\n";
   }
 
-  novikov::IntervalSet tree(1);
+  novikov::IntIntervalSet tree(1);
   expectTrue(!tree.load(filename), "load bad header: false");
 
   std::remove(filename.c_str());
@@ -423,7 +420,7 @@ void testLoadIntervalOutOfRange()
     out << "10 150\n";
   }
 
-  novikov::IntervalSet tree(1);
+  novikov::IntIntervalSet tree(1);
   expectTrue(!tree.load(filename), "load bad interval: false");
 
   std::remove(filename.c_str());
@@ -431,8 +428,30 @@ void testLoadIntervalOutOfRange()
 
 void testLoadMissingFile()
 {
-  novikov::IntervalSet tree(1);
+  novikov::IntIntervalSet tree(1);
   expectTrue(!tree.load("no-such-file.tmp"), "load missing: false");
+}
+
+void testLongLongIndexType()
+{
+  using LongSet = novikov::IntervalSet<long long>;
+
+  LongSet tree(1000000LL);
+  tree.add(100LL, 200LL);
+  tree.add(500000LL, 600000LL);
+
+  expectTrue(tree.has(150LL), "long long: has inside");
+  expectTrue(!tree.has(300LL), "long long: has gap");
+  expectTrue(tree.has(550000LL), "long long: has second");
+  expect64(tree.getLength(), 100100LL, "long long: length");
+
+  const std::vector<LongSet::Interval> intervals = tree.getIntervals();
+  expectInt(static_cast<int>(intervals.size()), 2,
+            "long long: 2 intervals");
+  expect64(intervals[0].first, 100LL, "long long: f1");
+  expect64(intervals[0].second, 200LL, "long long: s1");
+  expect64(intervals[1].first, 500000LL, "long long: f2");
+  expect64(intervals[1].second, 600000LL, "long long: s2");
 }
 
 void testScenarioFromTask()
@@ -714,6 +733,7 @@ int main(int argc, char** argv)
   RUN_TEST(testLoadMalformedHeader);
   RUN_TEST(testLoadIntervalOutOfRange);
   RUN_TEST(testLoadMissingFile);
+  RUN_TEST(testLongLongIndexType);
 
   RUN_TEST(testScenarioFromTask);
   RUN_TEST(testShowEmptyTree);
