@@ -105,11 +105,6 @@ bool IntervalSet::SegmentTree::containsPoint(int index) const
   return containsPointImpl(1, 0, rangeSize_, index);
 }
 
-std::int64_t IntervalSet::SegmentTree::getTotalLength() const
-{
-  return sum_[1];
-}
-
 void IntervalSet::SegmentTree::collectImpl(int node, int nodeLeft,
                                             int nodeRight,
                                             std::vector<Interval>& result,
@@ -182,7 +177,13 @@ bool IntervalSet::has(int point) const
 
 std::int64_t IntervalSet::getLength() const
 {
-  return tree_.getTotalLength();
+  std::int64_t total = 0;
+
+  for (const auto& interval : getIntervals()) {
+    total += static_cast<std::int64_t>(interval.second)
+           - static_cast<std::int64_t>(interval.first);
+  }
+  return total;
 }
 
 std::vector<IntervalSet::Interval> IntervalSet::getIntervals() const

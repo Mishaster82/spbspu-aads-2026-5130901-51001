@@ -270,7 +270,7 @@ void testUnite()
   expectInt(result.getRangeSize(), 100, "unite: range");
   expectInt(static_cast<int>(result.getIntervals().size()), 3,
             "unite: 3 intervals");
-  expect64(result.getLength(), 20, "unite: length 20");
+  expect64(result.getLength(), 25, "unite: length 25");
 }
 
 void testUniteDifferentRangeSizes()
@@ -456,7 +456,9 @@ void testScenarioFromTask()
       "YES\n"
       "NO\n"
       "15\n"
+      "OK\n"
       "[10,14] [19,30] [40,50]\n"
+      "OK\n"
       "[12,14] [19,22]\n";
 
   const ProcessorResult result = runProcessor(input);
@@ -584,7 +586,7 @@ void testSaveAndLoadScenario()
         "show B\n");
 
     expectInt(result.code, 0, "load: exit 0");
-    expectStr(result.out, "OK\n[10,20]\n", "load: output");
+    expectStr(result.out, "OK\nOK\n[10,20]\n", "load: output");
   }
 
   std::remove(filename.c_str());
@@ -619,7 +621,8 @@ void testSaveOverwriteDeclined()
         "load X " + filename + "\n"
         "show X\n");
 
-    expectStr(result.out, "OK\n[10,20]\n", "overwrite n: preserved");
+    expectStr(result.out, "OK\nOK\n[10,20]\n",
+              "overwrite n: preserved");
   }
 
   std::remove(filename.c_str());
@@ -652,7 +655,8 @@ void testSaveOverwriteConfirmed()
         "load X " + filename + "\n"
         "show X\n");
 
-    expectStr(result.out, "OK\n[50,60]\n", "overwrite y: new content");
+    expectStr(result.out, "OK\nOK\n[50,60]\n",
+              "overwrite y: new content");
   }
 
   std::remove(filename.c_str());

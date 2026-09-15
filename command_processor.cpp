@@ -72,6 +72,12 @@ const IntervalSet& CommandProcessor::getTree(const std::string& name) const
 void CommandProcessor::printIntervals(const IntervalSet& tree) const
 {
   const std::vector<IntervalSet::Interval> result = tree.getIntervals();
+
+  if (result.empty()) {
+    out_ << "{}\n";
+    return;
+  }
+
   bool first = true;
 
   for (const auto& interval : result) {
@@ -217,6 +223,7 @@ void CommandProcessor::handleLoad(std::istream& args)
 
   trees_.erase(name);
   trees_.emplace(name, std::move(placeholder));
+  out_ << "OK\n";
 }
 
 bool CommandProcessor::processLine(const std::string& line)
