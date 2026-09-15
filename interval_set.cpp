@@ -94,9 +94,17 @@ void IntervalSet::add(int left, int right)
   tree_.assign(left, right + 1, true);
 }
 
+void IntervalSet::remove(int left, int right)
+{
+  if (left < 0 || right >= rangeSize_ || left > right) {
+    throw std::out_of_range("interval out of range");
+  }
+  tree_.assign(left, right + 1, false);
+}
+
 int IntervalSet::getRangeSize() const
 {
   return rangeSize_;
 }
 
-} 
+}

@@ -21,6 +21,7 @@ public:
   IntervalSet& operator=(IntervalSet&& other) noexcept = default;
 
   void add(int left, int right);
+  void remove(int left, int right);
 
   int getRangeSize() const;
 
