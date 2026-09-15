@@ -109,6 +109,46 @@ std::int64_t IntervalSet::SegmentTree::totalLength() const
   return sum_[1];
 }
 
+void IntervalSet::SegmentTree::collectImpl(int node, int nodeLeft,
+                                            int nodeRight,
+                                            std::vector<Interval>& result,
+                                            int& openStart) const
+{
+  if (sum_[node] == 0) {
+    if (openStart != noLazy) {
+      result.emplace_back(openStart, nodeLeft - 1);
+      openStart = noLazy;
+    }
+    return;
+  }
+
+  if (sum_[node] == nodeRight - nodeLeft) {
+    if (openStart == noLazy) {
+      openStart = nodeLeft;
+    }
+    return;
+  }
+
+  const int mid = nodeLeft + (nodeRight - nodeLeft) / 2;
+
+  collectImpl(2 * node, nodeLeft, mid, result, openStart);
+  collectImpl(2 * node + 1, mid, nodeRight, result, openStart);
+}
+
+std::vector<IntervalSet::Interval>
+IntervalSet::SegmentTree::getIntervals() const
+{
+  std::vector<Interval> result;
+  int openStart = noLazy;
+
+  collectImpl(1, 0, rangeSize_, result, openStart);
+
+  if (openStart != noLazy) {
+    result.emplace_back(openStart, rangeSize_ - 1);
+  }
+  return result;
+}
+
 IntervalSet::IntervalSet(int rangeSize)
   : rangeSize_(rangeSize),
     tree_(rangeSize)
@@ -142,6 +182,11 @@ bool IntervalSet::has(int point) const
 std::int64_t IntervalSet::getLength() const
 {
   return tree_.totalLength();
+}
+
+std::vector<IntervalSet::Interval> IntervalSet::getIntervals() const
+{
+  return tree_.getIntervals();
 }
 
 int IntervalSet::getRangeSize() const

@@ -24,6 +24,7 @@ public:
   void remove(int left, int right);
   bool has(int point) const;
   std::int64_t getLength() const;
+  std::vector<Interval> getIntervals() const;
 
   int getRangeSize() const;
 
@@ -42,6 +43,7 @@ private:
     void assign(int left, int right, bool value);
     bool containsPoint(int index) const;
     std::int64_t totalLength() const;
+    std::vector<Interval> getIntervals() const;
 
   private:
     int rangeSize_;
@@ -56,6 +58,9 @@ private:
                             int index) const;
     void pushDown(int node, int nodeLeft, int nodeRight);
     void applyAssign(int node, int nodeLeft, int nodeRight, bool value);
+    void collectImpl(int node, int nodeLeft, int nodeRight,
+                      std::vector<Interval>& result,
+                      int& openStart) const;
   };
 
   int rangeSize_;
