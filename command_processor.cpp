@@ -1,6 +1,8 @@
 #include "command_processor.h"
 
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 namespace novikov {
 
@@ -160,8 +162,10 @@ void CommandProcessor::handleUnion(std::istream& args)
   const IntIntervalSet& first = getTree(firstName);
   const IntIntervalSet& second = getTree(secondName);
 
+  IntIntervalSet result = IntIntervalSet::unite(first, second);
+
   trees_.erase(newName);
-  trees_.emplace(newName, IntIntervalSet::unite(first, second));
+  trees_.emplace(newName, std::move(result));
 }
 
 void CommandProcessor::handleIntersect(std::istream& args)
@@ -173,8 +177,10 @@ void CommandProcessor::handleIntersect(std::istream& args)
   const IntIntervalSet& first = getTree(firstName);
   const IntIntervalSet& second = getTree(secondName);
 
+  IntIntervalSet result = IntIntervalSet::intersect(first, second);
+
   trees_.erase(newName);
-  trees_.emplace(newName, IntIntervalSet::intersect(first, second));
+  trees_.emplace(newName, std::move(result));
 }
 
 void CommandProcessor::handleSave(std::istream& args)
