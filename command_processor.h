@@ -33,6 +33,8 @@ private:
   void handleShow(std::istream& args);
   void handleUnion(std::istream& args);
   void handleIntersect(std::istream& args);
+  void handleSave(std::istream& args);
+  void handleLoad(std::istream& args);
 
   IntervalSet& getTree(const std::string& name);
   const IntervalSet& getTree(const std::string& name) const;

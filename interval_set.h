@@ -2,6 +2,7 @@
 #define NOVIKOV_INTERVAL_SET_H
 
 #include <cstdint>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -31,6 +32,9 @@ public:
                             const IntervalSet& right);
   static IntervalSet intersect(const IntervalSet& left,
                                 const IntervalSet& right);
+
+  bool save(const std::string& filename) const;
+  bool load(const std::string& filename);
 
 private:
   class SegmentTree

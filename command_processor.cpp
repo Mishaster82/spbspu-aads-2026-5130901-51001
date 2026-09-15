@@ -173,6 +173,33 @@ void CommandProcessor::handleIntersect(std::istream& args)
   trees_.emplace(newName, IntervalSet::intersect(first, second));
 }
 
+void CommandProcessor::handleSave(std::istream& args)
+{
+  const std::string name = readToken(args, "save");
+  const std::string filename = readToken(args, "save");
+
+  const IntervalSet& tree = getTree(name);
+
+  if (!tree.save(filename)) {
+    throw std::runtime_error("failed to write file '" + filename + "'");
+  }
+}
+
+void CommandProcessor::handleLoad(std::istream& args)
+{
+  const std::string name = readToken(args, "load");
+  const std::string filename = readToken(args, "load");
+
+  IntervalSet placeholder(1);
+
+  if (!placeholder.load(filename)) {
+    throw std::runtime_error("failed to read file '" + filename + "'");
+  }
+
+  trees_.erase(name);
+  trees_.emplace(name, std::move(placeholder));
+}
+
 bool CommandProcessor::processLine(const std::string& line)
 {
   std::istringstream args(line);
@@ -198,6 +225,10 @@ bool CommandProcessor::processLine(const std::string& line)
     handleUnion(args);
   } else if (command == "intersect") {
     handleIntersect(args);
+  } else if (command == "save") {
+    handleSave(args);
+  } else if (command == "load") {
+    handleLoad(args);
   } else {
     throw std::runtime_error("unknown command '" + command + "'");
   }

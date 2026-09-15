@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <fstream>
 #include <stdexcept>
 
 namespace novikov {
@@ -241,6 +242,53 @@ IntervalSet IntervalSet::intersect(const IntervalSet& left,
     }
   }
   return result;
+}
+
+bool IntervalSet::save(const std::string& filename) const
+{
+  std::ofstream out(filename);
+
+  if (!out) {
+    return false;
+  }
+
+  out << rangeSize_ << '\n';
+
+  for (const auto& interval : getIntervals()) {
+    out << interval.first << ' ' << interval.second << '\n';
+  }
+  return static_cast<bool>(out);
+}
+
+bool IntervalSet::load(const std::string& filename)
+{
+  std::ifstream in(filename);
+
+  if (!in) {
+    return false;
+  }
+
+  int loadedRangeSize = 0;
+
+  if (!(in >> loadedRangeSize) || loadedRangeSize <= 0) {
+    return false;
+  }
+
+  SegmentTree loadedTree(loadedRangeSize);
+
+  int left = 0;
+  int right = 0;
+
+  while (in >> left >> right) {
+    if (left < 0 || right >= loadedRangeSize || left > right) {
+      return false;
+    }
+    loadedTree.assign(left, right + 1, true);
+  }
+
+  rangeSize_ = loadedRangeSize;
+  tree_ = std::move(loadedTree);
+  return true;
 }
 
 }
