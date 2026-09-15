@@ -279,11 +279,18 @@ bool IntervalSet::load(const std::string& filename)
   int left = 0;
   int right = 0;
 
-  while (in >> left >> right) {
+  while (in >> left) {
+    if (!(in >> right)) {
+      return false;
+    }
     if (left < 0 || right >= loadedRangeSize || left > right) {
       return false;
     }
     loadedTree.assign(left, right + 1, true);
+  }
+
+  if (!in.eof()) {
+    return false;
   }
 
   rangeSize_ = loadedRangeSize;
