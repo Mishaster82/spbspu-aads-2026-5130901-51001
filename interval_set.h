@@ -25,8 +25,12 @@ public:
   bool has(int point) const;
   std::int64_t getLength() const;
   std::vector<Interval> getIntervals() const;
-
   int getRangeSize() const;
+
+  static IntervalSet unite(const IntervalSet& left,
+                            const IntervalSet& right);
+  static IntervalSet intersect(const IntervalSet& left,
+                                const IntervalSet& right);
 
 private:
   class SegmentTree

@@ -147,6 +147,32 @@ void CommandProcessor::handleShow(std::istream& args)
   printIntervals(tree);
 }
 
+void CommandProcessor::handleUnion(std::istream& args)
+{
+  const std::string newName = readToken(args, "union");
+  const std::string firstName = readToken(args, "union");
+  const std::string secondName = readToken(args, "union");
+
+  const IntervalSet& first = getTree(firstName);
+  const IntervalSet& second = getTree(secondName);
+
+  trees_.erase(newName);
+  trees_.emplace(newName, IntervalSet::unite(first, second));
+}
+
+void CommandProcessor::handleIntersect(std::istream& args)
+{
+  const std::string newName = readToken(args, "intersect");
+  const std::string firstName = readToken(args, "intersect");
+  const std::string secondName = readToken(args, "intersect");
+
+  const IntervalSet& first = getTree(firstName);
+  const IntervalSet& second = getTree(secondName);
+
+  trees_.erase(newName);
+  trees_.emplace(newName, IntervalSet::intersect(first, second));
+}
+
 bool CommandProcessor::processLine(const std::string& line)
 {
   std::istringstream args(line);
@@ -168,6 +194,10 @@ bool CommandProcessor::processLine(const std::string& line)
     handleLength(args);
   } else if (command == "show") {
     handleShow(args);
+  } else if (command == "union") {
+    handleUnion(args);
+  } else if (command == "intersect") {
+    handleIntersect(args);
   } else {
     throw std::runtime_error("unknown command '" + command + "'");
   }

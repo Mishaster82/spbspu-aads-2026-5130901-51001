@@ -1,5 +1,6 @@
 #include "interval_set.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <stdexcept>
 
@@ -192,6 +193,54 @@ std::vector<IntervalSet::Interval> IntervalSet::getIntervals() const
 int IntervalSet::getRangeSize() const
 {
   return rangeSize_;
+}
+
+IntervalSet IntervalSet::unite(const IntervalSet& left,
+                                const IntervalSet& right)
+{
+  const int resultRangeSize = std::max(left.rangeSize_, right.rangeSize_);
+  IntervalSet result(resultRangeSize);
+
+  for (const auto& interval : left.getIntervals()) {
+    result.add(interval.first, interval.second);
+  }
+  for (const auto& interval : right.getIntervals()) {
+    result.add(interval.first, interval.second);
+  }
+  return result;
+}
+
+IntervalSet IntervalSet::intersect(const IntervalSet& left,
+                                    const IntervalSet& right)
+{
+  const int resultRangeSize = std::min(left.rangeSize_, right.rangeSize_);
+  IntervalSet result(resultRangeSize);
+
+  const std::vector<Interval> leftIntervals = left.getIntervals();
+  const std::vector<Interval> rightIntervals = right.getIntervals();
+
+  std::size_t leftIndex = 0;
+  std::size_t rightIndex = 0;
+
+  while (leftIndex < leftIntervals.size()
+         && rightIndex < rightIntervals.size()) {
+    const int lower = std::max(leftIntervals[leftIndex].first,
+                                rightIntervals[rightIndex].first);
+    const int upper = std::min(leftIntervals[leftIndex].second,
+                                rightIntervals[rightIndex].second);
+
+    if (lower <= upper) {
+      result.add(lower, upper);
+    }
+
+    if (leftIntervals[leftIndex].second
+        < rightIntervals[rightIndex].second) {
+      ++leftIndex;
+    } else {
+      ++rightIndex;
+    }
+  }
+  return result;
 }
 
 }
