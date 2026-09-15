@@ -1,5 +1,6 @@
 #include "command_processor.h"
 
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -179,6 +180,24 @@ void CommandProcessor::handleSave(std::istream& args)
   const std::string filename = readToken(args, "save");
 
   const IntervalSet& tree = getTree(name);
+
+  std::ifstream existing(filename);
+
+  if (existing) {
+    out_ << "File \"" << filename
+         << "\" already exists. Overwrite? (y/n)\n";
+
+    std::string answer;
+
+    if (!(in_ >> answer)) {
+      throw std::runtime_error("missing overwrite confirmation for 'save'");
+    }
+
+    if (answer != "y") {
+      out_ << "Cancelled\n";
+      return;
+    }
+  }
 
   if (!tree.save(filename)) {
     throw std::runtime_error("failed to write file '" + filename + "'");
