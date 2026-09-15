@@ -80,6 +80,35 @@ void IntervalSet::SegmentTree::assign(int left, int right, bool value)
   assignImpl(1, 0, rangeSize_, left, right, value);
 }
 
+bool IntervalSet::SegmentTree::containsPointImpl(int node, int nodeLeft,
+                                                  int nodeRight,
+                                                  int index) const
+{
+  if (sum_[node] == 0) {
+    return false;
+  }
+  if (sum_[node] == nodeRight - nodeLeft) {
+    return true;
+  }
+
+  const int mid = nodeLeft + (nodeRight - nodeLeft) / 2;
+
+  if (index < mid) {
+    return containsPointImpl(2 * node, nodeLeft, mid, index);
+  }
+  return containsPointImpl(2 * node + 1, mid, nodeRight, index);
+}
+
+bool IntervalSet::SegmentTree::containsPoint(int index) const
+{
+  return containsPointImpl(1, 0, rangeSize_, index);
+}
+
+std::int64_t IntervalSet::SegmentTree::totalLength() const
+{
+  return sum_[1];
+}
+
 IntervalSet::IntervalSet(int rangeSize)
   : rangeSize_(rangeSize),
     tree_(rangeSize)
@@ -100,6 +129,19 @@ void IntervalSet::remove(int left, int right)
     throw std::out_of_range("interval out of range");
   }
   tree_.assign(left, right + 1, false);
+}
+
+bool IntervalSet::has(int point) const
+{
+  if (point < 0 || point >= rangeSize_) {
+    return false;
+  }
+  return tree_.containsPoint(point);
+}
+
+std::int64_t IntervalSet::getLength() const
+{
+  return tree_.totalLength();
 }
 
 int IntervalSet::getRangeSize() const

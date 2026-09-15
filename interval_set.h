@@ -22,6 +22,8 @@ public:
 
   void add(int left, int right);
   void remove(int left, int right);
+  bool has(int point) const;
+  std::int64_t getLength() const;
 
   int getRangeSize() const;
 
@@ -38,6 +40,8 @@ private:
     SegmentTree& operator=(SegmentTree&& other) noexcept = default;
 
     void assign(int left, int right, bool value);
+    bool containsPoint(int index) const;
+    std::int64_t totalLength() const;
 
   private:
     int rangeSize_;
@@ -48,6 +52,8 @@ private:
 
     void assignImpl(int node, int nodeLeft, int nodeRight,
                      int queryLeft, int queryRight, bool value);
+    bool containsPointImpl(int node, int nodeLeft, int nodeRight,
+                            int index) const;
     void pushDown(int node, int nodeLeft, int nodeRight);
     void applyAssign(int node, int nodeLeft, int nodeRight, bool value);
   };
