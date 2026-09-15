@@ -10,6 +10,8 @@ namespace novikov {
 namespace {
 
 constexpr std::int8_t noLazy = -1;
+constexpr std::int8_t lazyOn = 1;
+constexpr std::int8_t lazyOff = 0;
 constexpr std::size_t segmentTreeSizeMultiplier = 4;
 
 }
@@ -22,14 +24,11 @@ int IntervalSet::SegmentTree::checkRangeSize(int rangeSize)
   return rangeSize;
 }
 
-IntervalSet::SegmentTree::SegmentTree(int rangeSize)
-  : rangeSize_(checkRangeSize(rangeSize)),
-    sum_(segmentTreeSizeMultiplier
-             * static_cast<std::size_t>(rangeSize_),
-         0),
-    lazy_(segmentTreeSizeMultiplier
-              * static_cast<std::size_t>(rangeSize_),
-          noLazy)
+IntervalSet::SegmentTree::SegmentTree(int rangeSize):
+  rangeSize_(checkRangeSize(rangeSize)),
+  sum_(segmentTreeSizeMultiplier * static_cast<std::size_t>(rangeSize_), 0),
+  lazy_(segmentTreeSizeMultiplier * static_cast<std::size_t>(rangeSize_),
+        noLazy)
 {
 }
 
@@ -37,7 +36,7 @@ void IntervalSet::SegmentTree::applyAssign(int node, int nodeLeft,
                                             int nodeRight, bool value)
 {
   sum_[node] = value ? (nodeRight - nodeLeft) : 0;
-  lazy_[node] = value ? 1 : 0;
+  lazy_[node] = value ? lazyOn : lazyOff;
 }
 
 void IntervalSet::SegmentTree::pushDown(int node, int nodeLeft,
@@ -48,7 +47,7 @@ void IntervalSet::SegmentTree::pushDown(int node, int nodeLeft,
   }
 
   const int mid = nodeLeft + (nodeRight - nodeLeft) / 2;
-  const bool value = (lazy_[node] != 0);
+  const bool value = (lazy_[node] == lazyOn);
 
   applyAssign(2 * node, nodeLeft, mid, value);
   applyAssign(2 * node + 1, mid, nodeRight, value);
@@ -106,7 +105,7 @@ bool IntervalSet::SegmentTree::containsPoint(int index) const
   return containsPointImpl(1, 0, rangeSize_, index);
 }
 
-std::int64_t IntervalSet::SegmentTree::totalLength() const
+std::int64_t IntervalSet::SegmentTree::getTotalLength() const
 {
   return sum_[1];
 }
@@ -151,9 +150,9 @@ IntervalSet::SegmentTree::getIntervals() const
   return result;
 }
 
-IntervalSet::IntervalSet(int rangeSize)
-  : rangeSize_(rangeSize),
-    tree_(rangeSize)
+IntervalSet::IntervalSet(int rangeSize):
+  rangeSize_(rangeSize),
+  tree_(rangeSize)
 {
 }
 
@@ -183,7 +182,7 @@ bool IntervalSet::has(int point) const
 
 std::int64_t IntervalSet::getLength() const
 {
-  return tree_.totalLength();
+  return tree_.getTotalLength();
 }
 
 std::vector<IntervalSet::Interval> IntervalSet::getIntervals() const

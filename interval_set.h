@@ -50,7 +50,7 @@ private:
 
     void assign(int left, int right, bool value);
     bool containsPoint(int index) const;
-    std::int64_t totalLength() const;
+    std::int64_t getTotalLength() const;
     std::vector<Interval> getIntervals() const;
 
   private:

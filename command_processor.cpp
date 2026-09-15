@@ -41,11 +41,11 @@ int readInt(std::istream& args, const std::string& commandName)
 }
 
 CommandProcessor::CommandProcessor(std::istream& in, std::ostream& out,
-                                    std::ostream& err)
-  : in_(in),
-    out_(out),
-    err_(err),
-    trees_()
+                                    std::ostream& err):
+  in_(in),
+  out_(out),
+  err_(err),
+  trees_()
 {
 }
 
