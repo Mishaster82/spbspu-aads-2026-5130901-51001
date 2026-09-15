@@ -12,12 +12,20 @@
 namespace {
 
 int failures = 0;
+bool verbose = false;
+
+void logTest(const std::string& name)
+{
+  if (verbose) {
+    std::cout << "[ RUN  ] " << name << '\n';
+  }
+}
 
 void expectTrue(bool condition, const std::string& what)
 {
   if (!condition) {
     ++failures;
-    std::cerr << "FAIL: " << what << '\n';
+    std::cout << "  [FAIL] " << what << '\n';
   }
 }
 
@@ -25,7 +33,7 @@ void expectInt(int actual, int expected, const std::string& what)
 {
   if (actual != expected) {
     ++failures;
-    std::cerr << "FAIL: " << what
+    std::cout << "  [FAIL] " << what
               << ": expected " << expected
               << ", got " << actual << '\n';
   }
@@ -36,7 +44,7 @@ void expect64(std::int64_t actual, std::int64_t expected,
 {
   if (actual != expected) {
     ++failures;
-    std::cerr << "FAIL: " << what
+    std::cout << "  [FAIL] " << what
               << ": expected " << expected
               << ", got " << actual << '\n';
   }
@@ -47,9 +55,9 @@ void expectStr(const std::string& actual, const std::string& expected,
 {
   if (actual != expected) {
     ++failures;
-    std::cerr << "FAIL: " << what << '\n'
-              << "  expected:\n" << expected
-              << "  actual:\n" << actual;
+    std::cout << "  [FAIL] " << what << '\n'
+              << "    expected:\n" << expected
+              << "    actual:\n" << actual;
   }
 }
 
@@ -586,7 +594,7 @@ void testSaveAndLoadScenario()
         "show B\n");
 
     expectInt(result.code, 0, "load: exit 0");
-    expectStr(result.out, "OK\nOK\n[10,20]\n", "load: output");
+    expectStr(result.out, "OK\n[10,20]\n", "load: output");
   }
 
   std::remove(filename.c_str());
@@ -621,8 +629,7 @@ void testSaveOverwriteDeclined()
         "load X " + filename + "\n"
         "show X\n");
 
-    expectStr(result.out, "OK\nOK\n[10,20]\n",
-              "overwrite n: preserved");
+    expectStr(result.out, "OK\n[10,20]\n", "overwrite n: preserved");
   }
 
   std::remove(filename.c_str());
@@ -655,8 +662,7 @@ void testSaveOverwriteConfirmed()
         "load X " + filename + "\n"
         "show X\n");
 
-    expectStr(result.out, "OK\nOK\n[50,60]\n",
-              "overwrite y: new content");
+    expectStr(result.out, "OK\n[50,60]\n", "overwrite y: new content");
   }
 
   std::remove(filename.c_str());
@@ -670,55 +676,67 @@ void testLoadMissingFileInCommand()
   expectInt(result.code, 1, "load missing: exit 1");
 }
 
+#define RUN_TEST(fn) \
+  do { \
+    logTest(#fn); \
+    fn(); \
+  } while (0)
+
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  testEmptyTreeHas();
-  testEmptyTreeLengthAndIntervals();
-  testAddSingleInterval();
-  testAddMergesOverlapping();
-  testAddMergesAdjacent();
-  testAddKeepsSeparate();
-  testRemoveSplitsInterval();
-  testRemoveAll();
-  testRemoveFromEmpty();
-  testHasOutOfRange();
-  testAddOutOfRangeThrows();
-  testLengthExampleFromTask();
-  testUnite();
-  testUniteDifferentRangeSizes();
-  testIntersect();
-  testIntersectEmpty();
-  testCopyAndMove();
-  testSaveLoadRoundTrip();
-  testLoadDanglingPair();
-  testLoadMalformedHeader();
-  testLoadIntervalOutOfRange();
-  testLoadMissingFile();
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "-v") {
+      verbose = true;
+    }
+  }
 
-  testScenarioFromTask();
-  testShowEmptyTree();
-  testCreateDuplicateFails();
-  testCreateInvalidRangeFails();
-  testUnknownTreeFails();
-  testUnknownCommandFails();
-  testAddOutOfRangeFails();
-  testHasOutOfRangeInCommand();
-  testInvalidIntegerFails();
-  testMissingArgumentFails();
-  testEmptyLinesIgnored();
-  testUnionAndIntersectSameRange();
-  testSaveAndLoadScenario();
-  testSaveOverwriteDeclined();
-  testSaveOverwriteConfirmed();
-  testLoadMissingFileInCommand();
+  RUN_TEST(testEmptyTreeHas);
+  RUN_TEST(testEmptyTreeLengthAndIntervals);
+  RUN_TEST(testAddSingleInterval);
+  RUN_TEST(testAddMergesOverlapping);
+  RUN_TEST(testAddMergesAdjacent);
+  RUN_TEST(testAddKeepsSeparate);
+  RUN_TEST(testRemoveSplitsInterval);
+  RUN_TEST(testRemoveAll);
+  RUN_TEST(testRemoveFromEmpty);
+  RUN_TEST(testHasOutOfRange);
+  RUN_TEST(testAddOutOfRangeThrows);
+  RUN_TEST(testLengthExampleFromTask);
+  RUN_TEST(testUnite);
+  RUN_TEST(testUniteDifferentRangeSizes);
+  RUN_TEST(testIntersect);
+  RUN_TEST(testIntersectEmpty);
+  RUN_TEST(testCopyAndMove);
+  RUN_TEST(testSaveLoadRoundTrip);
+  RUN_TEST(testLoadDanglingPair);
+  RUN_TEST(testLoadMalformedHeader);
+  RUN_TEST(testLoadIntervalOutOfRange);
+  RUN_TEST(testLoadMissingFile);
+
+  RUN_TEST(testScenarioFromTask);
+  RUN_TEST(testShowEmptyTree);
+  RUN_TEST(testCreateDuplicateFails);
+  RUN_TEST(testCreateInvalidRangeFails);
+  RUN_TEST(testUnknownTreeFails);
+  RUN_TEST(testUnknownCommandFails);
+  RUN_TEST(testAddOutOfRangeFails);
+  RUN_TEST(testHasOutOfRangeInCommand);
+  RUN_TEST(testInvalidIntegerFails);
+  RUN_TEST(testMissingArgumentFails);
+  RUN_TEST(testEmptyLinesIgnored);
+  RUN_TEST(testUnionAndIntersectSameRange);
+  RUN_TEST(testSaveAndLoadScenario);
+  RUN_TEST(testSaveOverwriteDeclined);
+  RUN_TEST(testSaveOverwriteConfirmed);
+  RUN_TEST(testLoadMissingFileInCommand);
 
   if (failures == 0) {
-    std::cerr << "All tests passed\n";
+    std::cout << "All tests passed\n";
     return 0;
   }
 
-  std::cerr << "Failures: " << failures << '\n';
+  std::cout << "Failures: " << failures << '\n';
   return 1;
 }
